@@ -1,0 +1,6 @@
+[submodule "deps/redis"]
+	path = deps/redis
+	url = https://github.com/antirez/redis
+[submodule "deps/zstd"]
+	path = deps/zstd
+	url = https://github.com/facebook/zstd.git
