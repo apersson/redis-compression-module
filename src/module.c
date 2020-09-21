@@ -131,9 +131,13 @@ long long dict_create_with_id(struct compress_module *mod, long long id,
 	struct dict *const dict = RedisModule_Alloc(sizeof (*dict));
 
 	dict->id = id;
-	dict->prefix = RedisModule_Alloc(prefix_len);
-	(void) memcpy(dict->prefix, prefix, prefix_len);
-	dict->prefix_len = prefix_len;
+	dict->prefix = NULL;
+	dict->prefix_len = 0;
+	if (prefix_len > 0) {
+		dict->prefix = RedisModule_Alloc(prefix_len);
+		(void) memcpy(dict->prefix, prefix, prefix_len);
+		dict->prefix_len = prefix_len;
+	}
 	dict->mem_uncompressed = 0;
 	dict->mem_compressed = 0;
 
@@ -195,7 +199,6 @@ struct zipstr *zipstr_alloc(struct compress_module *module,
     size_t orig_len) {
 
 	/* Data was compressed successfully; create an object */ 
-	// struct zipstr *const zs = RedisModule_Alloc(sizeof(*zs));
 	struct zipstr *const zs = RedisModule_Alloc(sizeof(*zs) + len);
 	zs->orig_len = orig_len;
 	zs->len = len;
@@ -346,18 +349,20 @@ int zipstr_aux_load(RedisModuleIO *rdb, int encver, int when) {
 	for (uint64_t i = 0; i < ndicts; i++) {
 		const uint64_t id = RedisModule_LoadUnsigned(rdb);
 		const uint64_t prefix_len = RedisModule_LoadUnsigned(rdb);
-		const char *prefix;
+		char *prefix = NULL;
 
 		if (prefix_len > 0) {
 			prefix = RedisModule_LoadStringBuffer(rdb, NULL);
 		}
 		size_t buflen;
-		const char *const buf = RedisModule_LoadStringBuffer(rdb,
+		char *const buf = RedisModule_LoadStringBuffer(rdb,
 		    &buflen);
 
 		RedisModule_Log(NULL, "debug", "Loading dict with ID %llu", id);
 		long long ret = dict_create_with_id(&module, id, buf,
 		    buflen, prefix, prefix_len, module.clevel);
+		RedisModule_Free(buf);
+		RedisModule_Free(prefix);
 		if (ret < 0) {
 			RedisModule_Log(NULL, "error",
 			    "Failed to load dict %llu", id);

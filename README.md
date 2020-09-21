@@ -45,10 +45,10 @@ ZipStr001
 $ redis-cli get foo
 ```
 
-## Working with Dictionaries
+### Working with Dictionaries
 
-WARNING: Traning a dictionary leaks memory (~6 MB per operation). It's
-         recommended that all TRAIN operations are performed on a replica.
+**WARNING**: Traning a dictionary leaks memory (~6 MB per operation). It's
+recommended that all TRAIN operations are performed on a replica.
 
 Train a new default dictionary:
 ```
