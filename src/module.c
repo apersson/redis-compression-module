@@ -43,10 +43,10 @@ struct compress_module {
 	RedisModuleDict *all_dicts;	/* All dictionaries */
 	RedisModuleDict *prefix_dicts;	/* Active prefix dictionaries */
 
-	RedisModuleString *zstd_set_str;
+	RedisModuleString *set_str;
 	RedisModuleCommandFilter *set_filter;
 
-	RedisModuleString *zstd_get_str;
+	RedisModuleString *get_str;
 	RedisModuleCommandFilter *get_filter;
 
 	ZSTD_CCtx *cctx;
@@ -484,13 +484,12 @@ void command_filter(RedisModuleCommandFilterCtx *fctx, const char *replace_cmd,
 }
 
 void set_command_filter(RedisModuleCommandFilterCtx *fctx) {
-	command_filter(fctx, "set", module.zstd_set_str);
+	command_filter(fctx, "set", module.set_str);
 }
 
 void get_command_filter(RedisModuleCommandFilterCtx *fctx) {
-	command_filter(fctx, "get", module.zstd_get_str);
+	command_filter(fctx, "get", module.get_str);
 }
-
 
 int TransparentCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 	if (argc != 2) {
@@ -840,8 +839,6 @@ int DictCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 	    "Unknown subcommand. Try DICT HELP.");
 }
 
-RedisModuleString *zstd_set_str;
-
 void info_cb(RedisModuleInfoCtx *ictx, int for_crash_report) {
 	REDISMODULE_NOT_USED(for_crash_report);
 
@@ -883,12 +880,11 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
 	module.all_dicts = RedisModule_CreateDict(ctx);
 	module.prefix_dicts = RedisModule_CreateDict(ctx);
 	module.set_filter = NULL;
-	module.zstd_set_str = RedisModule_CreateString(ctx, MODPREFIX".set", 8); 
+	module.set_str = RedisModule_CreateStringPrintf(ctx, "%s.set",
+	    MODPREFIX);
 	module.get_filter = NULL;
-	module.zstd_get_str = RedisModule_CreateString(ctx, MODPREFIX".get", 8); 
-
-	RedisModule_Log(NULL, "debug", "Registering type ver %d",
-	    REDISMODULE_TYPE_METHOD_VERSION);
+	module.get_str = RedisModule_CreateStringPrintf(ctx, "%s.get",
+	    MODPREFIX);
 
 	RedisModuleTypeMethods tm = {
 		.version = REDISMODULE_TYPE_METHOD_VERSION,
