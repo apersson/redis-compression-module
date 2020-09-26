@@ -153,7 +153,7 @@ $ cat dict.raw | redis-cli -x compress.dict restore
 
 ### COMPRESS.DICT RESTORE <dictBuffer>
 Creates a new dictionary from the provided dictionary data. The data could have
-been obtained using [`COMPRESS.DICT RESTORE`](#compressdict-restore) or
+been obtained using [`COMPRESS.DICT DUMP`](#compressdict-dump) or
 through any `zstd --train`.
 
 > **NOTE** Currently only supported for the default dictionary.
