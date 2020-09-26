@@ -70,7 +70,7 @@ It was trained on 397 objects. The default target size for dictionaries is
 100 KB, but can be changed using the `DICTSIZE` option.
 
 
-#### Trains a Prefix Specific Dictionary
+#### Train a Prefix Specific Dictionary
 
 To train a new dictionary for keys that match a specific prefix, use the
 `PREFIX` option:
@@ -78,7 +78,7 @@ To train a new dictionary for keys that match a specific prefix, use the
 $ redis-cli compress.dict train prefix foo
 ```
 
-You can use the ([`COMPRESS.DICT LIST`](#compress.dict-list) command to get
+You can use the [`COMPRESS.DICT LIST`](#compress.dict-list) command to get
 details about loaded dictionaries.
 
 ## Commands
