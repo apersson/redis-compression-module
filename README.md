@@ -78,7 +78,7 @@ To train a new dictionary for keys that match a specific prefix, use the
 $ redis-cli compress.dict train prefix foo
 ```
 
-You can use the [`COMPRESS.DICT LIST`](#compress.dict-list) command to get
+You can use the [`COMPRESS.DICT LIST`](#compressdict-list) command to get
 details about loaded dictionaries.
 
 ## Commands
@@ -140,7 +140,7 @@ Simple string.
 
 ### COMPRESS.DICT DUMP
 Dumps the content of a dictionary so that it can later be loaded using
-[`COMPRESS.DICT RESTORE`](#compress.dict-restore).
+[`COMPRESS.DICT RESTORE`](#compressdict-restore).
 
 #### Returns
 Bulk string.
@@ -153,7 +153,7 @@ $ cat dict.raw | redis-cli -x compress.dict restore
 
 ### COMPRESS.DICT RESTORE <dictBuffer>
 Creates a new dictionary from the provided dictionary data. The data could have
-been obtained using [`COMPRESS.DICT RESTORE`](#compress.dict-restore) or
+been obtained using [`COMPRESS.DICT RESTORE`](#compressdict-restore) or
 through any `zstd --train`.
 
 > **NOTE** Currently only supported for the default dictionary.
