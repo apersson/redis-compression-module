@@ -127,6 +127,10 @@ void dict_rele(struct compress_module *mod, struct dict *dict,
 long long dict_create_with_id(struct compress_module *mod, long long id,
     const char *buf, size_t buflen, const char *prefix, size_t prefix_len,
     int clevel) {
+	if (RedisModule_DictGetC(mod->all_dicts, &id, sizeof (id),
+	    NULL) != NULL) {
+		return -1;
+	}
 
 	struct dict *const dict = RedisModule_Alloc(sizeof (*dict));
 
@@ -157,7 +161,6 @@ long long dict_create_with_id(struct compress_module *mod, long long id,
 	/* drop previous dictionary */
 	dict_rele(mod, mod->dict, NULL);
 
-	/* XXX */
 	(void) RedisModule_DictSetC(mod->all_dicts, &dict->id,
 	    sizeof (dict->id), dict);
 
