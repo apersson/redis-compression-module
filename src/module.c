@@ -129,6 +129,7 @@ long long dict_create_with_id(struct compress_module *mod, long long id,
     int clevel) {
 	if (RedisModule_DictGetC(mod->all_dicts, &id, sizeof (id),
 	    NULL) != NULL) {
+		RedisModule_Log(NULL, "error", "Duplicate dictionary ID");
 		return -1;
 	}
 
@@ -158,23 +159,23 @@ long long dict_create_with_id(struct compress_module *mod, long long id,
 	}
 	dict->refcnt = 1;
 
-	/* drop previous dictionary */
-	dict_rele(mod, mod->dict, NULL);
-
 	(void) RedisModule_DictSetC(mod->all_dicts, &dict->id,
 	    sizeof (dict->id), dict);
 
 	if (prefix != NULL) {
-		/* TODO check for an existing dict, mark as inactive */
+		struct dict *const pdict = RedisModule_DictGetC(
+		    mod->prefix_dicts, dict->prefix, dict->prefix_len, NULL);
+		if (pdict != NULL) {
+			dict_rele(mod, pdict, NULL);
+		}
 		(void) RedisModule_DictSetC(mod->prefix_dicts, dict->prefix,
 		    dict->prefix_len, dict);
 	} else {
-		/* Default dict */
+		/* drop previous default dictionary */
+		dict_rele(mod, mod->dict, NULL);
 		mod->dict = dict;
 	}
 
-
-	RedisModule_Log(NULL, "error", "ALL OK");
 	return dict->id;
 }
 
